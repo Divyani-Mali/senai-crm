@@ -17,18 +17,44 @@ A production-grade AI CRM system that autonomously monitors emails, triages with
 
 ## Architecture
 
-Email JSON → Ingestion → Heuristic Filter → LLM Classification (Groq)
-↓ ↑
-Priority Queue RAG Pipeline
-↓ (ChromaDB)
-Autonomous Agent
-(ReAct Pattern)
-↓
-┌───────────────┼───────────────┐
-↓ ↓ ↓
-Auto-Reply Escalate Flag Legal
-↓ ↓ ↓
-SQLite DB ←── Audit Log ──→ Frontend (Streamlit)
+```
+┌─────────────────────────────────────────────────────────┐
+│                    EMAIL INGESTION                       │
+│            email-data-advanced.json (60 emails)          │
+└─────────────────────┬───────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────────────┐
+│              HEURISTIC PRE-FILTER (fast)                 │
+│         Spam │ Security │ Legal │ Urgency Detection      │
+└──────┬────────────────┬────────────────┬────────────────┘
+       ↓                ↓                ↓
+   [IGNORED]       [ESCALATED]      [RECEIVED]
+   Spam/Block      Security/Legal   Normal Flow
+                                        ↓
+┌─────────────────────────────────────────────────────────┐
+│           LLM CLASSIFICATION ENGINE (Groq)               │
+│     Thread History + RAG Context + Structured Output     │
+└──────────────────────┬──────────────────────────────────┘
+                       ↓                    ↑
+              ┌────────────────┐    ┌───────────────┐
+              │  AUTONOMOUS    │    │  RAG PIPELINE │
+              │  AGENT (ReAct) │    │  (ChromaDB)   │
+              └────────┬───────┘    └───────────────┘
+                       ↓
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+  [Auto-Reply]   [Escalate]    [Flag Legal]
+        ↓              ↓              ↓
+┌─────────────────────────────────────────────────────────┐
+│                  SQLite DATABASE                         │
+│     emails │ threads │ contacts │ actions │ audit_log    │
+└─────────────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────────────┐
+│              STREAMLIT DASHBOARD                         │
+│   Mission Control │ Thread View │ Analytics │ RAG Debug  │
+└─────────────────────────────────────────────────────────┘
+```
 
 ## Setup Instructions
 
