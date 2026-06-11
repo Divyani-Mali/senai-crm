@@ -1,0 +1,143 @@
+
+<style>
+#erd { padding: 8px 0; }
+#erd svg { width: 100% !important; }
+</style>
+<div id="erd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#1e3a5f' : '#e6f1fb',
+    primaryTextColor: dark ? '#93c5fd' : '#0c447c',
+    primaryBorderColor: dark ? '#2d5a8e' : '#b5d4f4',
+    secondaryColor: dark ? '#1a2540' : '#f0f4f8',
+    tertiaryColor: dark ? '#0d1526' : '#f8fbff',
+  },
+});
+
+const diagram = `erDiagram
+  contacts {
+    int id PK
+    string email UK
+    string name
+    string company
+    string status
+    float account_value
+    float churn_risk_score
+    datetime created_at
+    datetime last_contact_at
+  }
+
+  threads {
+    int id PK
+    string thread_id UK
+    string subject
+    string sender_email FK
+    datetime first_seen_at
+    datetime last_updated_at
+    string status
+    string assigned_to
+  }
+
+  emails {
+    int id PK
+    string thread_id FK
+    string message_id UK
+    string sender
+    string subject
+    text body
+    datetime timestamp
+    float sentiment_score
+    string category
+    string urgency
+    bool requires_human
+    float confidence
+    json raw_entities
+    string status
+    text suggested_reply
+    text escalation_reason
+  }
+
+  actions {
+    int id PK
+    int email_id FK
+    json agent_reasoning_log
+    string action_type
+    text proposed_content
+    bool is_approved
+    string approved_by
+    datetime executed_at
+  }
+
+  audit_log {
+    int id PK
+    string entity_type
+    int entity_id
+    string action
+    string performed_by
+    datetime timestamp
+    json diff
+  }
+
+  knowledge_chunks {
+    int id PK
+    string source_doc
+    text chunk_text
+    vector embedding
+    datetime created_at
+  }
+
+  web_intelligence_cache {
+    int id PK
+    string source_url
+    string target_entity
+    json scraped_data
+    datetime scraped_at
+    datetime expires_at
+  }
+
+  contacts ||--o{ threads : "has"
+  threads ||--o{ emails : "contains"
+  emails ||--o{ actions : "triggers"
+  emails }o--|| audit_log : "logged in"
+  actions }o--|| audit_log : "logged in"
+`;
+
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill','stroke','stroke-width','class','style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>
