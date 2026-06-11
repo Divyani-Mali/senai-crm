@@ -166,6 +166,10 @@ streamlit run app.py
 
 ## Architectural Decisions & Trade-offs
 
+## System Architecture
+
+![System Architecture](docs/architectural_diagram.png)
+
 ### SQLite vs PostgreSQL
 
 - Chose SQLite for zero-config portability in demo
