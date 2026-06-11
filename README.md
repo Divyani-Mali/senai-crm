@@ -164,9 +164,26 @@ streamlit run app.py
 | Bob SLA breach (msg_060) | Full thread retrieved, SLA policy searched, flagged for legal + escalated  |
 | Spam emails              | Heuristic filter catches at ingest, status=Ignored, never auto-replied     |
 
+## Documentation
+
+### Architecture Diagram
+![Architecture Diagram](docs/architectural_diagram.png)
+
+
+### API Documentation
+
+OpenAPI specification is available at:
+
+- `docs/openapi.json`
+
+Swagger UI can be accessed locally at:
+
+```text
+http://localhost:8000/docs
+```
+
 ## Architectural Decisions & Trade-offs
 
-## System Architecture
 
 ![System Architecture](docs/architectural_diagram.png)
 
