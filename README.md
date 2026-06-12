@@ -1,5 +1,8 @@
 # SenAI CRM — AI-Powered Email Intelligence Platform
 
+# Github Repository
+https://github.com/Divyani-Mali/senai-crm
+
 ## Overview
 
 A production-grade AI CRM system that autonomously monitors emails, triages with multi-dimensional intelligence, executes agentic workflows, and surfaces real-time business insights.
